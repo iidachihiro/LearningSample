@@ -36,4 +36,13 @@ public class Rule {
     public Condition getPostCondition(int i) {
         return this.postConditions.get(i);
     }
+    
+    public void addNewPostCondition(Condition postCondition) {
+        this.postConditions.add(postCondition);
+    }
+    
+    public boolean isSameKind(ActionSet as) {
+        return this.preCondition.getName().equals(as.getPreMonitorableAction()) 
+                && this.action.equals(as.getControllableAction());
+    }
 }

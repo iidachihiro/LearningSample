@@ -11,6 +11,12 @@ public class ActionSet {
         this.postMonitorableAction = z;
     }
     
+    public ActionSet(String...strings) {
+        this.preMonitorableAction = strings[0];
+        this.controllableAction = strings[1];
+        this.postMonitorableAction = strings[2];
+    }
+    
     public String getPreMonitorableAction() {
         return preMonitorableAction;
     }
