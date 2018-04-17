@@ -13,6 +13,10 @@ public class SGDModelUpdator {
         this.rules = rules;
     }
     
+    public List<Rule> getRules() {
+        return this.rules;
+    }
+    
     public void learn(ActionSet as) {
         StochasticGradientDescent sgd = new StochasticGradientDescent();
         for (Rule rule : rules) {

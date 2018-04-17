@@ -1,8 +1,10 @@
 package util;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +17,7 @@ public class Utils {
     private static String originalPath = "/Users/iidachihiro/workspace/LearningSample/";
     private static String baseRulesPath = originalPath+"resources/BaseRules.txt";
     private static String tracesPath = originalPath+"resources/Traces.txt";
+    private static String resultPath = originalPath+"Result.csv";
     
     private final static String tab = "  ";
     
@@ -91,6 +94,22 @@ public class Utils {
         for (ActionSet set : sets) {
             System.out.println(set.getPreMonitorableAction()+","
                     +set.getControllableAction()+","+set.getPostMonitorableAction());
+        }
+    }
+    
+    public static void outputResult(List<Rule> rules) {
+        try {
+            File file = new File(resultPath);
+            BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+            for (Rule rule : rules) {
+                for (Condition cond : rule.getPostConditions()) {
+                    bw.write(rule.getPreCondition().getName()+","+rule.getAction()+","+cond.getName()+","+cond.getValue());
+                    bw.newLine();
+                }
+            }
+            bw.close();
+        } catch (IOException e) {
+            System.err.println(e.toString());
         }
     }
 }
