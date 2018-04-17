@@ -103,7 +103,7 @@ public class Utils {
             BufferedWriter bw = new BufferedWriter(new FileWriter(file));
             for (Rule rule : rules) {
                 for (Condition cond : rule.getPostConditions()) {
-                    bw.write(rule.getPreCondition().getName()+","+rule.getAction()+","+cond.getName()+","+cond.getValue());
+                    bw.write(rule.getPreCondition().getName()+","+rule.getAction()+","+cond.getName());
                     bw.newLine();
                 }
             }

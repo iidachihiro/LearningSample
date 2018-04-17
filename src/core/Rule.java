@@ -9,6 +9,12 @@ public class Rule {
     private String action;
     private List<Condition> postConditions;
     
+    public Rule(Condition pre, String act) {
+        this.preCondition = pre;
+        this.action = act;
+        this.postConditions = new ArrayList<>();
+    }
+    
     public Rule(ActionSet as) {
         this.preCondition = new Condition(as.getPreMonitorableAction());
         this.action = as.getControllableAction();
@@ -44,5 +50,14 @@ public class Rule {
     public boolean isSameKind(ActionSet as) {
         return this.preCondition.getName().equals(as.getPreMonitorableAction()) 
                 && this.action.equals(as.getControllableAction());
+    }
+    
+    public void removePostCondition(Condition cond_) {
+        for (Condition cond : this.postConditions) {
+            if (cond.equals(cond_)) {
+                this.postConditions.remove(cond);
+                break;
+            }
+        }
     }
 }
