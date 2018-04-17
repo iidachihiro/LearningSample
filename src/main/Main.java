@@ -4,7 +4,7 @@ import java.util.List;
 
 import core.ActionSet;
 import core.Rule;
-import sgd.SGDModelUpdator;
+import model.sgd.SGDModelUpdator;
 import util.Utils;
 
 public class Main {
@@ -16,5 +16,6 @@ public class Main {
             updator.learn(set);
         }
         Utils.outputResult(updator.getRules());
+        System.out.println("learning finished.");
     }
 }

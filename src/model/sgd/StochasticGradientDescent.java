@@ -1,4 +1,4 @@
-package sgd;
+package model.sgd;
 
 import core.Condition;
 import core.Rule;

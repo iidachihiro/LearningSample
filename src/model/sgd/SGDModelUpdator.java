@@ -1,20 +1,15 @@
-package sgd;
+package model.sgd;
 
 import java.util.List;
 
 import core.ActionSet;
 import core.Condition;
 import core.Rule;
+import model.ModelUpdator;
 
-public class SGDModelUpdator {
-    private List<Rule> rules;
-    
+public class SGDModelUpdator extends ModelUpdator {
     public SGDModelUpdator(List<Rule> rules) {
-        this.rules = rules;
-    }
-    
-    public List<Rule> getRules() {
-        return this.rules;
+        super(rules);
     }
     
     public void learn(ActionSet as) {
