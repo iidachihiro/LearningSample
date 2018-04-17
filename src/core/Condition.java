@@ -34,4 +34,22 @@ public class Condition {
     public int getCount() {
         return this.count;
     }
+    
+    public void setValue(double value) {
+        this.value = value;
+    }
+    
+    public void setPreValue(double preValue) {
+        this.preValue = preValue;
+    }
+    
+    public void setGradient(double gradient) {
+        this.gradient = gradient;
+    }
+    
+    public double updateValue(double rate) {
+        this.value -= rate*this.gradient;
+        if (this.value < 0) this.value = 0;
+        return this.value;
+    }
 }
