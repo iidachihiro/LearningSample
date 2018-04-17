@@ -19,11 +19,6 @@ public class StochasticGradientDescent {
     public Rule getUpdatedRule(Rule rule, String observedData) {
         this.observedData = observedData;
         pos = getPreAndActMatchingPosition(rule);
-        compute(rule);
-        return rule;
-    }
-    
-    private void compute(Rule rule) {
         initializeTotal(rule);
         setGradientForEachPostConditions(rule);
         // For normalization
@@ -34,6 +29,7 @@ public class StochasticGradientDescent {
         for (Condition cond : rule.getPostConditions()) {
             cond.setValue(cond.getValue()/sum); 
         }
+        return rule;
     }
     
     private int getPreAndActMatchingPosition(Rule rule) {
@@ -63,7 +59,7 @@ public class StochasticGradientDescent {
     private double computeGradient(Rule rule, Condition cond) {
         double pb = getProbability(rule);
         if (observedData.equals(cond.getName())) {
-            return getGradInternal(cond, pb);
+            return getGradInternal(rule, pb);
         } else {
             return getGradExternal(rule, pb);
         }
@@ -73,11 +69,11 @@ public class StochasticGradientDescent {
         return rule.getPostCondition(pos).getValue()/total;
     }
     
-    private double getGradInternal(Condition cond, double pb) {
-        return 2*(1-pb)*(total-cond.getValue())/(total*total);
+    private double getGradInternal(Rule rule, double pb) {
+        return -2*(1-pb)*(total-rule.getPostCondition(pos).getValue())/(total*total);
     }
     
     private double getGradExternal(Rule rule, double pb) {
-        return 2*(1-pb)*(-rule.getPostCondition(pos).getValue())/(total*total);
+        return 2*(1-pb)*(rule.getPostCondition(pos).getValue())/(total*total);
     }
 }
