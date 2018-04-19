@@ -9,7 +9,7 @@ import core.Rule;
 import model.ModelUpdator;
 
 public class SGDModelUpdator extends ModelUpdator {
-    private final double THRESHOLD = 1.0e-14;
+    private final double THRESHOLD = 0.1;
     
     public SGDModelUpdator(List<Rule> rules) {
         super(rules);
