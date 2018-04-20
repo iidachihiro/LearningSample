@@ -52,8 +52,7 @@ public class SGDModelUpdator extends ModelUpdator {
     
     private boolean isAffectedByThreshold(Rule rule) {
         for (Condition cond : rule.getPostConditions()) {
-            if ((cond.getPreValue() < THRESHOLD) && (cond.getValue() >= THRESHOLD) 
-                    || (cond.getPreValue() >= THRESHOLD) && (cond.getValue() < THRESHOLD))  {
+            if ((cond.getPreValue()-THRESHOLD)*(cond.getValue()-THRESHOLD) < 0)  {
                 return true;
             }
         }
