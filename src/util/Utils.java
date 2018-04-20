@@ -20,7 +20,7 @@ public class Utils {
     private static String originalPath = "/Users/iidachihiro/workspace/LearningSample/";
     private static String baseRulesPath = originalPath+"resources/BaseRules.txt";
     private static String tracesPath = originalPath+"resources/Traces.txt";
-    private static String resultPath = originalPath+"Result.csv";
+    private static String resultPath = originalPath+"Result.txt";
     private static String modelPath = originalPath+"Domain.txt";
     
     private final static String tab = "  ";
@@ -104,14 +104,19 @@ public class Utils {
     public static void outputResult(List<Rule> rules) {
         try {
             File file = new File(resultPath);
-            BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+            PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
+            int index = 0;
             for (Rule rule : rules) {
+                pw.println("Rule "+index+":");
+                pw.println(tab+"PreCondition: "+rule.getPreCondition().getName());
+                pw.println(tab+"Action: "+rule.getAction());
+                pw.println(tab+"PostConditions: ");
                 for (Condition cond : rule.getPostConditions()) {
-                    bw.write(rule.getPreCondition().getName()+","+rule.getAction()+","+cond.getName());
-                    bw.newLine();
+                    pw.println(tab+tab+cond.getName()+tab+cond.getValue());
                 }
+                index++;
             }
-            bw.close();
+            pw.close();
         } catch (IOException e) {
             System.err.println(e.toString());
         }
