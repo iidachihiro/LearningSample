@@ -12,8 +12,6 @@ import util.Utils;
 public class DomainModelGenerator {
     private List<FSPSentence> fsps;
     
-    private static final String[] maps = {"MAP['e]", "MAP['m]", "MAP['w]"};
-    
     public DomainModelGenerator() {
         this.fsps = new ArrayList<>();
     }
@@ -48,6 +46,19 @@ public class DomainModelGenerator {
         System.out.println("Domain model is updated.");
     }
     
+    
+    private int getIndexOf(String map) {
+        for (int i = 0; i < this.fsps.size(); i++) {
+            FSPSentence fsp = this.fsps.get(i);
+            if (fsp.getMap().equals(map)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    
+    // for sample traces
+    
     private String translateCondition(Condition cond) {
         String name = cond.getName();
         switch (name) {
@@ -71,6 +82,7 @@ public class DomainModelGenerator {
     }
     
     private String translateMAP(String pre) {
+        final String[] maps = {"MAP['e]", "MAP['m]", "MAP['w]"};
         switch (pre) {
             case "arrive['e]":
                 return maps[0];
@@ -106,15 +118,5 @@ public class DomainModelGenerator {
             default:
                 return null;
         }
-    }
-    
-    private int getIndexOf(String map) {
-        for (int i = 0; i < this.fsps.size(); i++) {
-            FSPSentence fsp = this.fsps.get(i);
-            if (fsp.getMap().equals(map)) {
-                return i;
-            }
-        }
-        return -1;
     }
 }
