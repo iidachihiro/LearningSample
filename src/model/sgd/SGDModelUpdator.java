@@ -1,12 +1,13 @@
 package model.sgd;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import core.ActionSet;
 import core.Condition;
 import core.Rule;
+import model.DomainModelGenerator;
 import model.ModelUpdator;
+import util.Utils;
 
 public class SGDModelUpdator extends ModelUpdator {
     private final double THRESHOLD = 0.1;
@@ -17,19 +18,28 @@ public class SGDModelUpdator extends ModelUpdator {
     
     public void learn(List<ActionSet> sets) {
         for (ActionSet as : sets) {
-            update(as);
+            if (update(as)) {
+                Utils.outputResult(this.rules, THRESHOLD);
+                DomainModelGenerator generator = new DomainModelGenerator();
+                generator.generate(this.rules, THRESHOLD);
+            }
         }
-        rules = removeVerySmallPostCondition();
     }
     
-    public void update(ActionSet as) {
+    public boolean update(ActionSet as) {
+        boolean flag = false;
         StochasticGradientDescent sgd = new StochasticGradientDescent();
         for (Rule rule : rules) {
             if (rule.isSameKind(as)) {
-                rules.set(rules.indexOf(rule), sgd.getUpdatedRule(rule, as.getPostMonitorableAction()));
+                Rule updatedRule = sgd.getUpdatedRule(rule, as.getPostMonitorableAction());
+                rules.set(rules.indexOf(rule), updatedRule);
+                if (isAffectedByThreshold(rule)) {
+                    flag = true;
+                }
                 updatePreValue();
             }
         }
+        return flag;
     }
     
     private void updatePreValue() {
@@ -40,17 +50,13 @@ public class SGDModelUpdator extends ModelUpdator {
         }
     }
     
-    private List<Rule> removeVerySmallPostCondition() {
-        List<Rule> rules_ = new ArrayList<>();
-        for (Rule rule : rules) {
-            Rule rule_ = new Rule(rule.getPreCondition(), rule.getAction());
-            for (Condition cond : rule.getPostConditions()) {
-                if (cond.getValue() >= THRESHOLD) {
-                    rule_.addNewPostCondition(cond);
-                }
+    private boolean isAffectedByThreshold(Rule rule) {
+        for (Condition cond : rule.getPostConditions()) {
+            if ((cond.getPreValue() < THRESHOLD) && (cond.getValue() >= THRESHOLD) 
+                    || (cond.getPreValue() >= THRESHOLD) && (cond.getValue() < THRESHOLD))  {
+                return true;
             }
-            rules_.add(rule_);
         }
-        return rules_;
+        return false;
     }
 }

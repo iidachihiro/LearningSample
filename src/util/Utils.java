@@ -101,7 +101,7 @@ public class Utils {
         }
     }
     
-    public static void outputResult(List<Rule> rules) {
+    public static void outputResult(List<Rule> rules, double threshold) {
         try {
             File file = new File(resultPath);
             PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
@@ -112,6 +112,9 @@ public class Utils {
                 pw.println(tab+"Action: "+rule.getAction());
                 pw.println(tab+"PostConditions: ");
                 for (Condition cond : rule.getPostConditions()) {
+                    if (cond.getValue() < threshold) {
+                        continue;
+                    }
                     pw.println(tab+tab+cond.getName()+tab+cond.getValue());
                 }
                 index++;

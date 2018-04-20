@@ -18,12 +18,15 @@ public class DomainModelGenerator {
         this.fsps = new ArrayList<>();
     }
     
-    public void generate(List<Rule> rules) {
+    public void generate(List<Rule> rules, double threshold) {
         for (Rule rule : rules) {
             String map = translateMAP(translateCondition(rule.getPreCondition()));
             String action = translateAction(rule.getAction());
             List<String> posts = new ArrayList<>();
             for (Condition cond : rule.getPostConditions()) {
+                if (cond.getValue() < threshold) {
+                    continue;
+                }
                 String post = translateCondition(cond);
                 if (!posts.contains(post)) {
                     posts.add(post+" -> "+translateMAP(post));
@@ -42,6 +45,7 @@ public class DomainModelGenerator {
             }
         }
         Utils.outputDomainModel(fsps);
+        System.out.println("Domain model is updated.");
     }
     
     private String translateCondition(Condition cond) {

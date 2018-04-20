@@ -17,7 +17,7 @@ public abstract class ModelUpdator {
         return this.rules;
     }
     
-    public abstract void update(ActionSet as);
+    public abstract boolean update(ActionSet as);
     
     public abstract void learn(List<ActionSet> sets);
 }
