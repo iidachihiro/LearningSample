@@ -17,11 +17,12 @@ import model.fsp.FSPSentence;
 import model.fsp.Process;
 
 public class Utils {
-    private static String originalPath = "/Users/iidachihiro/workspace/LearningSample/";
+    private static String originalPath = "../";
     private static String baseRulesPath = originalPath+"resources/BaseRules.txt";
     private static String tracesPath = originalPath+"resources/Traces.txt";
     private static String resultPath = originalPath+"Result.txt";
     private static String modelPath = originalPath+"Domain.txt";
+    private static String configPath = originalPath+"resources/parameters.config";
     
     private final static String tab = "  ";
     
@@ -157,5 +158,43 @@ public class Utils {
         } catch (IOException e) {
             System.out.println(e.toString());
         }
+    }
+    
+    public static double readLearningRate() {
+        double rate = 0.1;
+        try {
+            File file = new File(configPath);
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] str = line.split(" ", 0);
+                if (str[0].equals("Learning_Rate")) {
+                    rate = Double.parseDouble(str[2]);
+                }
+            }
+            br.close();
+        } catch (IOException e) {
+            System.err.println(e.toString());
+        }
+        return rate;
+    }
+    
+    public static double readThreshold() {
+        double threshold = 0.1;
+        try {
+            File file = new File(configPath);
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] str = line.split(" ", 0);
+                if (str[0].equals("Threshold")) {
+                    threshold = Double.parseDouble(str[2]);
+                }
+            }
+            br.close();
+        } catch (IOException e) {
+            System.err.println(e.toString());
+        }
+       return threshold;
     }
 }

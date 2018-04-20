@@ -10,10 +10,11 @@ import model.ModelUpdator;
 import util.Utils;
 
 public class SGDModelUpdator extends ModelUpdator {
-    private final double THRESHOLD = 0.1;
+    private double THRESHOLD;
     
     public SGDModelUpdator(List<Rule> rules) {
         super(rules);
+        this.THRESHOLD = Utils.readThreshold();
     }
     
     public void learn(List<ActionSet> sets) {

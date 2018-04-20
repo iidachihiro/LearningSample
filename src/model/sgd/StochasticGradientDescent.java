@@ -2,18 +2,20 @@ package model.sgd;
 
 import core.Condition;
 import core.Rule;
+import util.Utils;
 
 public class StochasticGradientDescent {
     private double total;
     private String observedData;
     int pos;
     
-    private final double LEARNING_RATE = 0.1;
+    private double LEARNING_RATE;
     
     public StochasticGradientDescent() {
         this.total = 0;
         this.observedData = null;
         pos = 0;
+        this.LEARNING_RATE = Utils.readLearningRate();
     }
     
     public Rule getUpdatedRule(Rule rule, String observedData) {
