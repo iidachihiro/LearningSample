@@ -5,6 +5,7 @@ import java.util.List;
 import core.ActionSet;
 import core.Condition;
 import core.Rule;
+import model.DomainModelGenerator;
 import model.ModelUpdator;
 import model.sgd.SGDModelUpdator;
 import util.Utils;
@@ -20,6 +21,8 @@ public class Main {
         Utils.outputResult(SGDUpdator.getRules());
         System.out.println("learning finished.");
         printRules(SGDUpdator.getRules());
+        DomainModelGenerator generator = new DomainModelGenerator();
+        generator.generate(SGDUpdator.getRules());
     }
     
     static void printRules(List<Rule> rules) {

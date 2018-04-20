@@ -6,18 +6,22 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
 import core.ActionSet;
 import core.Condition;
 import core.Rule;
+import model.fsp.FSPSentence;
+import model.fsp.Process;
 
 public class Utils {
     private static String originalPath = "/Users/iidachihiro/workspace/LearningSample/";
     private static String baseRulesPath = originalPath+"resources/BaseRules.txt";
     private static String tracesPath = originalPath+"resources/Traces.txt";
     private static String resultPath = originalPath+"Result.csv";
+    private static String modelPath = originalPath+"Domain.txt";
     
     private final static String tab = "  ";
     
@@ -110,6 +114,40 @@ public class Utils {
             bw.close();
         } catch (IOException e) {
             System.err.println(e.toString());
+        }
+    }
+    
+    public static void outputDomainModel(List<FSPSentence> fsps) {
+        try {
+            File file = new File(modelPath);
+            PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
+            for (int i = 0; i < fsps.size(); i++) {
+                FSPSentence fsp = fsps.get(i);
+                pw.println(fsp.getMap()+"=");
+                pw.print("(");
+                for (int j = 0; j < fsp.getProcesses().size(); j++) {
+                    Process process = fsp.getProcess(j);
+                    pw.print(process.getAction()+" -> (");
+                    for (int k = 0; k < process.getPosts().size(); k++) {
+                        pw.print(process.getPosts().get(k));
+                        if (k < process.getPosts().size()-1) {
+                            pw.print("|");
+                        }
+                    }
+                    pw.println(")");
+                    if (j < fsp.getProcesses().size()-1) {
+                        pw.print("|");   
+                    }
+                }
+                if (i < fsps.size()-1) {
+                    pw.println("),");
+                } else {
+                    pw.println(").");
+                }
+            }
+            pw.close();
+        } catch (IOException e) {
+            System.out.println(e.toString());
         }
     }
 }
