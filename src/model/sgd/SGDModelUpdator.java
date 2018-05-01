@@ -28,12 +28,13 @@ public class SGDModelUpdator extends ModelUpdator {
         }
     }
     
-    public void learn(List<ActionSet> sets, int id) {
+    public void Plearn(List<ActionSet> sets) {
         for (ActionSet as : sets) {
-            if (update(as)) {
-                PUtils.outputResult(this.rules, THRESHOLD, id);
+            int updatedId = Pupdate(as);
+            if (updatedId > 0) {
+                PUtils.outputResult(this.rules, THRESHOLD);
                 DomainModelGenerator generator = new DomainModelGenerator();
-                generator.generate(this.rules, THRESHOLD, id);
+                generator.Pgenerate(this.rules, THRESHOLD, updatedId);
             }
         }
     }
@@ -52,6 +53,22 @@ public class SGDModelUpdator extends ModelUpdator {
             }
         }
         return flag;
+    }
+    
+    public int Pupdate(ActionSet as) {
+        int id = -1;
+        StochasticGradientDescent sgd = new StochasticGradientDescent();
+        for (Rule rule : rules) {
+            if (rule.isSameKind(as)) {
+                Rule updatedRule = sgd.getUpdatedRule(rule, as.getPostMonitorableAction());
+                rules.set(rules.indexOf(rule), updatedRule);
+                if (isAffectedByThreshold(rule)) {
+                    id = PUtils.getRobotId(rule);
+                }
+                updatePreValue();
+            }
+        }
+        return id;
     }
     
     private void updatePreValue() {

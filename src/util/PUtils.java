@@ -96,12 +96,10 @@ public class PUtils {
         }
     }
     
-    public static List<List<Rule>> readNBaseRules(int n) {
-        List<List<Rule>> allRules = new ArrayList<>();
+    public static List<Rule> readNBaseRules(int n) {
+        List<Rule> rules = new ArrayList<>();
         try {
             for (int i = 0; i < n; i++) {
-                allRules.add(new ArrayList<>());
-                List<Rule> rules = allRules.get(i);
                 File file = new File(resourcesPath+i+"_BaseRules.txt");
                 BufferedReader br = new BufferedReader(new FileReader(file));
                 String line;
@@ -124,14 +122,11 @@ public class PUtils {
         } catch (IOException e) {
             System.err.println(e.toString());
         }
-        return allRules;
+        return rules;
     }
     
-    public static List<List<ActionSet>> readParallelTraces(int n) {
-        List<List<ActionSet>> allSets = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            allSets.add(new ArrayList<>());
-        }
+    public static List<ActionSet> readParallelTraces(int n) {
+        List<ActionSet> allSets = new ArrayList<>();
         String[] pres = new String[n];
         Arrays.fill(pres, "");
         String[] acts = new String[n];
@@ -149,7 +144,7 @@ public class PUtils {
                     actFlags[id] = false;
                 } else {
                     if (!pres[id].equals("")) {
-                        allSets.get(id).add(new ActionSet(pres[id], acts[id], line));
+                        allSets.add(new ActionSet(pres[id], acts[id], line));
                     }
                     pres[id] = line;
                     actFlags[id] = true;
@@ -162,12 +157,20 @@ public class PUtils {
         return allSets;
     }
     
-    public static void outputResult(List<Rule> rules, double threshold, int id) {
+    public static void outputResult(List<Rule> rules, double threshold) {
         try {
-            File file = new File(originalPath+id+"_ResultPath.txt");
+            File file = new File(originalPath+"Result.txt");
             PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
             int index = 0;
+            int robotId = -1;
             for (Rule rule : rules) {
+                if (robotId != getRobotId(rule)) {
+                    index = 0;
+                    robotId = getRobotId(rule);
+                    pw.print("####################");
+                    pw.print("The rules of No. "+robotId);
+                    pw.println("####################");
+                }
                 pw.println("Rule "+index+":");
                 pw.println(tab+"PreCondition: "+rule.getPreCondition().getName());
                 pw.println(tab+"Action: "+rule.getAction());
@@ -186,9 +189,9 @@ public class PUtils {
         }
     }
     
-    public static void outputDomainModel(List<FSPSentence> fsps, int id) {
+    public static void outputDomainModel(List<FSPSentence> fsps) {
         try {
-            File file = new File(originalPath+id+"_Domain.txt");
+            File file = new File(originalPath+"Domain.txt");
             PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
             for (int i = 0; i < fsps.size(); i++) {
                 FSPSentence fsp = fsps.get(i);
@@ -219,7 +222,6 @@ public class PUtils {
             System.out.println(e.toString());
         }
     }
-    
     
     public static double readLearningRate() {
         double rate = 0.1;
@@ -257,5 +259,10 @@ public class PUtils {
             System.err.println(e.toString());
         }
        return threshold;
+    }
+    
+    public static int getRobotId(Rule rule) {
+        String name = rule.getPreCondition().getName();
+        return Integer.valueOf(name.substring(0, name.indexOf('_')));
     }
 }

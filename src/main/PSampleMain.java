@@ -14,13 +14,11 @@ public class PSampleMain {
     public static void main(String[] args) {
         PUtils.generateNBaseRules(PNUM);
         PUtils.generateParallelTraces(PNUM);
-        List<List<Rule>> allRules = PUtils.readNBaseRules(PNUM);
-        List<List<ActionSet>> allSets = PUtils.readParallelTraces(PNUM);
+        List<Rule> rules = PUtils.readNBaseRules(PNUM);
+        List<ActionSet> sets = PUtils.readParallelTraces(PNUM);
         // for sgd
-        for (int i = 0; i < PNUM; i++) {
-            ModelUpdator SGDupdator = new SGDModelUpdator(allRules.get(i));
-            SGDupdator.learn(allSets.get(i), i);
-            System.out.println("learning finished");
-        }
+        ModelUpdator SGDUpdator = new SGDModelUpdator(rules);
+        SGDUpdator.Plearn(sets);
+        System.out.println("learning finished.");
     }
 }

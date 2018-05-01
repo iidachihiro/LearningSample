@@ -47,7 +47,7 @@ public class DomainModelGenerator {
         System.out.println("Domain model is updated.");
     }
     
-    public void generate(List<Rule> rules, double threshold, int id) {
+    public void Pgenerate(List<Rule> rules, double threshold, int id) {
         for (Rule rule : rules) {
             String map = translateMAP(translateCondition(rule.getPreCondition()));
             String action = translateAction(rule.getAction());
@@ -73,10 +73,9 @@ public class DomainModelGenerator {
                 }
             }
         }
-        PUtils.outputDomainModel(fsps, id);
-        System.out.println(id+" Domain model is updated.");
+        PUtils.outputDomainModel(fsps);
+        System.out.println("No. "+id+" Domain model is updated.");
     }
-    
     
     private int getIndexOf(String map) {
         for (int i = 0; i < this.fsps.size(); i++) {

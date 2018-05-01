@@ -21,5 +21,5 @@ public abstract class ModelUpdator {
     
     public abstract void learn(List<ActionSet> sets);
     
-    public abstract void learn(List<ActionSet> sets, int id);
+    public abstract void Plearn(List<ActionSet> sets);
 }
