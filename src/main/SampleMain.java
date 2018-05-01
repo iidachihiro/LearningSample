@@ -8,7 +8,7 @@ import model.ModelUpdator;
 import model.sgd.SGDModelUpdator;
 import util.Utils;
 
-public class Main {
+public class SampleMain {
     public static void main(String[] args) {
         List<Rule> rules = Utils.readBaseRules();
         List<ActionSet> sets = Utils.readTraces();
