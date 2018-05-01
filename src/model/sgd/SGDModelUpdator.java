@@ -7,6 +7,7 @@ import core.Condition;
 import core.Rule;
 import model.DomainModelGenerator;
 import model.ModelUpdator;
+import util.PUtils;
 import util.Utils;
 
 public class SGDModelUpdator extends ModelUpdator {
@@ -23,6 +24,16 @@ public class SGDModelUpdator extends ModelUpdator {
                 Utils.outputResult(this.rules, THRESHOLD);
                 DomainModelGenerator generator = new DomainModelGenerator();
                 generator.generate(this.rules, THRESHOLD);
+            }
+        }
+    }
+    
+    public void learn(List<ActionSet> sets, int id) {
+        for (ActionSet as : sets) {
+            if (update(as)) {
+                PUtils.outputResult(this.rules, THRESHOLD, id);
+                DomainModelGenerator generator = new DomainModelGenerator();
+                generator.generate(this.rules, THRESHOLD, id);
             }
         }
     }

@@ -7,6 +7,7 @@ import core.Condition;
 import core.Rule;
 import model.fsp.FSPSentence;
 import model.fsp.Process;
+import util.PUtils;
 import util.Utils;
 
 public class DomainModelGenerator {
@@ -46,6 +47,36 @@ public class DomainModelGenerator {
         System.out.println("Domain model is updated.");
     }
     
+    public void generate(List<Rule> rules, double threshold, int id) {
+        for (Rule rule : rules) {
+            String map = translateMAP(translateCondition(rule.getPreCondition()));
+            String action = translateAction(rule.getAction());
+            List<String> posts = new ArrayList<>();
+            for (Condition cond : rule.getPostConditions()) {
+                if (cond.getValue() < threshold) {
+                    continue;
+                }
+                String post = translateCondition(cond);
+                if (!posts.contains(post)) {
+                    posts.add(post+" -> "+translateMAP(post));
+                }
+            }
+            int index = getIndexOf(map);
+            if (index < 0) { // fsps don't have same map
+                this.fsps.add(new FSPSentence(map, new Process(action, posts)));
+            } else {
+                int index_ = fsps.get(index).getIndexOf(action);
+                if (index_ < 0) { // fsps have same map, but don't have same action
+                    this.fsps.get(index).addProcess(new Process(action, posts));
+                } else { // fsps have same map and action
+                    this.fsps.get(index).getProcess(index_).addPosts(posts);
+                }
+            }
+        }
+        PUtils.outputDomainModel(fsps, id);
+        System.out.println(id+" Domain model is updated.");
+    }
+    
     
     private int getIndexOf(String map) {
         for (int i = 0; i < this.fsps.size(); i++) {
@@ -61,21 +92,26 @@ public class DomainModelGenerator {
     
     private String translateCondition(Condition cond) {
         String name = cond.getName();
+        String id = "";
+        if (name.indexOf('_') >= 1) {
+            id = name.substring(0, name.indexOf('_')+1);
+            name = name.substring(name.indexOf('_')+1);
+        }
         switch (name) {
             case "arrive.e":
-                return "arrive['e]";
+                return id+"arrive['e]";
             case "pickupfail":
-                return "pickupfail";
+                return id+"pickupfail";
             case "pickupsuccess":
-                return "pickupsuccess";
+                return id+"pickupsuccess";
             case "arrive.m":
-                return "arrive['m]";
+                return id+"arrive['m]";
             case "arrive.w":
-                return "arrive['w]";
+                return id+"arrive['w]";
             case "putsuccess":
-                return "putsuccess";
+                return id+"putsuccess";
             case "putfail":
-                return "putfail";
+                return id+"putfail";
             default:
                 return null;
         }
@@ -83,38 +119,48 @@ public class DomainModelGenerator {
     
     private String translateMAP(String pre) {
         final String[] maps = {"MAP['e]", "MAP['m]", "MAP['w]"};
+        String id = "";
+        if (pre.indexOf('_') >= 1) {
+            id = pre.substring(0, pre.indexOf('_')+1);
+            pre = pre.substring(pre.indexOf('_')+1);
+        }
         switch (pre) {
             case "arrive['e]":
-                return maps[0];
+                return id+maps[0];
             case "pickupfail":
-                return maps[0];
+                return id+maps[0];
             case "pickupsuccess":
-                return maps[0];
+                return id+maps[0];
             case "arrive['m]":
-                return maps[1];
+                return id+maps[1];
             case "arrive['w]":
-                return maps[2];
+                return id+maps[2];
             case "putsuccess":
-                return maps[2];
+                return id+maps[2];
             case "putfail":
-                return maps[2];
+                return id+maps[2];
             default:
                 return null;
         }
     }
     
     private String translateAction(String action) {
+        String id = "";
+        if (action.indexOf('_') >= 1) {
+            id = action.substring(0, action.indexOf('_')+1);
+            action = action.substring(action.indexOf('_')+1);
+        }
         switch (action) {
             case "move.e":
-                return "move['e]";
+                return id+"move['e]";
             case "move.m":
-                return "move['m]";
+                return id+"move['m]";
             case "move.w":
-                return "move['w]";
+                return id+"move['w]";
             case "pickup":
-                return "pickup";
+                return id+"pickup";
             case "putdown":
-                return "putdown";
+                return id+"putdown";
             default:
                 return null;
         }

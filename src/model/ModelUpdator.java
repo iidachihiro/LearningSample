@@ -20,4 +20,6 @@ public abstract class ModelUpdator {
     public abstract boolean update(ActionSet as);
     
     public abstract void learn(List<ActionSet> sets);
+    
+    public abstract void learn(List<ActionSet> sets, int id);
 }

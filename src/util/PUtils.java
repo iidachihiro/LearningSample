@@ -17,6 +17,8 @@ import java.util.Random;
 import core.ActionSet;
 import core.Condition;
 import core.Rule;
+import model.fsp.FSPSentence;
+import model.fsp.Process;
 
 public class PUtils {
     private static String originalPath = "../";
@@ -25,6 +27,8 @@ public class PUtils {
     private static String tracesPath = resourcesPath+"Traces.txt";
     private static String parallelTracesPath = resourcesPath+"ParallelTraces.txt";
     private static String configPath = originalPath+"resources/parameters.config";
+    
+    private final static String tab = "  ";
     
     public static void generateNBaseRules(int n) {
         List<String> lines = new ArrayList<>();
@@ -156,5 +160,102 @@ public class PUtils {
             System.err.println(e.toString());
         }
         return allSets;
+    }
+    
+    public static void outputResult(List<Rule> rules, double threshold, int id) {
+        try {
+            File file = new File(originalPath+id+"_ResultPath.txt");
+            PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
+            int index = 0;
+            for (Rule rule : rules) {
+                pw.println("Rule "+index+":");
+                pw.println(tab+"PreCondition: "+rule.getPreCondition().getName());
+                pw.println(tab+"Action: "+rule.getAction());
+                pw.println(tab+"PostConditions: ");
+                for (Condition cond : rule.getPostConditions()) {
+                    if (cond.getValue() < threshold) {
+                        continue;
+                    }
+                    pw.println(tab+tab+cond.getName()+tab+cond.getValue());
+                }
+                index++;
+            }
+            pw.close();
+        } catch (IOException e) {
+            System.err.println(e.toString());
+        }
+    }
+    
+    public static void outputDomainModel(List<FSPSentence> fsps, int id) {
+        try {
+            File file = new File(originalPath+id+"_Domain.txt");
+            PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
+            for (int i = 0; i < fsps.size(); i++) {
+                FSPSentence fsp = fsps.get(i);
+                pw.println(fsp.getMap()+"=");
+                pw.print("(");
+                for (int j = 0; j < fsp.getProcesses().size(); j++) {
+                    Process process = fsp.getProcess(j);
+                    pw.print(process.getAction()+" -> (");
+                    for (int k = 0; k < process.getPosts().size(); k++) {
+                        pw.print(process.getPosts().get(k));
+                        if (k < process.getPosts().size()-1) {
+                            pw.print("|");
+                        }
+                    }
+                    pw.println(")");
+                    if (j < fsp.getProcesses().size()-1) {
+                        pw.print("|");   
+                    }
+                }
+                if (i < fsps.size()-1) {
+                    pw.println("),");
+                } else {
+                    pw.println(").");
+                }
+            }
+            pw.close();
+        } catch (IOException e) {
+            System.out.println(e.toString());
+        }
+    }
+    
+    
+    public static double readLearningRate() {
+        double rate = 0.1;
+        try {
+            File file = new File(configPath);
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] str = line.split(" ", 0);
+                if (str[0].equals("Learning_Rate")) {
+                    rate = Double.parseDouble(str[2]);
+                }
+            }
+            br.close();
+        } catch (IOException e) {
+            System.err.println(e.toString());
+        }
+        return rate;
+    }
+    
+    public static double readThreshold() {
+        double threshold = 0.1;
+        try {
+            File file = new File(configPath);
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] str = line.split(" ", 0);
+                if (str[0].equals("Threshold")) {
+                    threshold = Double.parseDouble(str[2]);
+                }
+            }
+            br.close();
+        } catch (IOException e) {
+            System.err.println(e.toString());
+        }
+       return threshold;
     }
 }
