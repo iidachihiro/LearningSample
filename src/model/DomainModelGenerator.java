@@ -74,7 +74,7 @@ public class DomainModelGenerator {
             }
         }
         PUtils.outputDomainModel(fsps);
-        System.out.println("No. "+id+" Domain model is updated.");
+        PUtils.updateLog(id);
     }
     
     private int getIndexOf(String map) {

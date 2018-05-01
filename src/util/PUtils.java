@@ -27,8 +27,21 @@ public class PUtils {
     private static String tracesPath = resourcesPath+"Traces.txt";
     private static String parallelTracesPath = resourcesPath+"ParallelTraces.txt";
     private static String configPath = originalPath+"resources/parameters.config";
+    private static String resultPath = originalPath+"Result.txt";
+    private static String domainPath = originalPath+"Domain.txt";
+    private static String logPath = originalPath+"updatedLog";
     
     private final static String tab = "  ";
+    
+    public static void reflesh() {
+        String[] paths = {resultPath, domainPath, logPath};
+        for (String path : paths) {
+            File file = new File(path);
+            if (file.exists()) {
+                file.delete();
+            }
+        }
+    }
     
     public static void generateNBaseRules(int n) {
         List<String> lines = new ArrayList<>();
@@ -84,7 +97,6 @@ public class PUtils {
                     allTraces.remove(rvalue);
                 }
             }
-            System.out.println(parallelTraces.size());
             File _file = new File(parallelTracesPath);
             PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(_file)));
             for (String _line : parallelTraces) {
@@ -159,7 +171,7 @@ public class PUtils {
     
     public static void outputResult(List<Rule> rules, double threshold) {
         try {
-            File file = new File(originalPath+"Result.txt");
+            File file = new File(resultPath);
             PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
             int index = 0;
             int robotId = -1;
@@ -191,7 +203,7 @@ public class PUtils {
     
     public static void outputDomainModel(List<FSPSentence> fsps) {
         try {
-            File file = new File(originalPath+"Domain.txt");
+            File file = new File(domainPath);
             PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
             for (int i = 0; i < fsps.size(); i++) {
                 FSPSentence fsp = fsps.get(i);
@@ -259,6 +271,17 @@ public class PUtils {
             System.err.println(e.toString());
         }
        return threshold;
+    }
+    
+    public static void updateLog(int id) {
+        try {
+            File file = new File(logPath);
+            PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
+            pw.println("No. "+id+" Domain model is updated.");
+            pw.close();
+        } catch (IOException e) {
+            System.err.print(e.toString());
+        }
     }
     
     public static int getRobotId(Rule rule) {
