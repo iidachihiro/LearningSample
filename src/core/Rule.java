@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Rule {
-    private int count;
     private Condition preCondition;
     private String action;
     private List<Condition> postConditions;
@@ -20,11 +19,12 @@ public class Rule {
         this.action = as.getControllableAction();
         this.postConditions = new ArrayList<Condition>();
         postConditions.add(new Condition(as.getPostMonitorableAction()));
-        count = 0;
     }
     
-    public int getCount() {
-        return this.count;
+    public Rule(Rule rule) {
+        this.preCondition = rule.getPreCondition();
+        this.action = rule.getAction();
+        this.postConditions = rule.getPostConditions();
     }
     
     public Condition getPreCondition() {
