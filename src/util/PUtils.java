@@ -26,7 +26,8 @@ public class PUtils {
     private static String baseRulesPath = resourcesPath+"BaseRules.txt";
     private static String tracesPath = resourcesPath+"Traces.txt";
     private static String parallelTracesPath = resourcesPath+"ParallelTraces.txt";
-    private static String configPath = originalPath+"resources/parameters.config";
+    private static String baseActionsPath = resourcesPath+"BaseActions.txt";
+    private static String configPath = resourcesPath+"parameters.config";
     private static String resultPath = originalPath+"Result.txt";
     private static String domainPath = originalPath+"Domain.txt";
     private static String logPath = originalPath+"updatedLog";
@@ -54,10 +55,10 @@ public class PUtils {
             }
             br.close();
             for (int i = 0; i < n; i++) {
-                File _file = new File(resourcesPath+i+"_BaseRules.txt");
-                PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(_file)));
-                for (String _line : lines) {
-                    String[] strs = _line.split(",", 0);
+                File file_ = new File(resourcesPath+i+"_BaseRules.txt");
+                PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file_)));
+                for (String line_ : lines) {
+                    String[] strs = line_.split(",", 0);
                     for (int j = 0; j < 3; j++) {
                         strs[j] = i+"_"+strs[j];
                     }
@@ -97,12 +98,43 @@ public class PUtils {
                     allTraces.remove(rvalue);
                 }
             }
-            File _file = new File(parallelTracesPath);
-            PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(_file)));
-            for (String _line : parallelTraces) {
-                pw.println(_line);
+            File file_ = new File(parallelTracesPath);
+            PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file_)));
+            for (String line_ : parallelTraces) {
+                pw.println(line_);
             }
             pw.close();
+        } catch (IOException e) {
+            System.err.println(e.toString());
+        }
+    }
+    
+    public static void generateNBaseActions(int n) {
+        List<String> lines = new ArrayList<>();
+        try {
+            File file = new File(baseActionsPath);
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = br.readLine()) != null) {
+                lines.add(line);
+            }
+            br.close();
+            for (int i = 0; i < n; i++) {
+                File file_ = new File(resourcesPath+i+"_BaseActions.txt");
+                PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file_)));
+                for (String line_ : lines) {
+                    if (line_.equals("#Monitorable") || line_.equals("#Controllable") || line_.length() == 0) {
+                        pw.println(line_);
+                    } else {
+                        String[] strs = line_.split(",", 0);
+                        for (int j = 0; j < strs.length; j++) {
+                            strs[j] = i+"_"+strs[j];
+                        }
+                        pw.println(String.join(",", strs));
+                    }
+                }
+                pw.close();
+            }
         } catch (IOException e) {
             System.err.println(e.toString());
         }
@@ -169,6 +201,45 @@ public class PUtils {
         return allSets;
     }
     
+    public static List<Rule> readNBaseActions (int n) {
+        List<Rule> rules = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            List<String> monitorable = new ArrayList<>();
+            List<String> controllable = new ArrayList<>();
+            try {
+                File file = new File(resourcesPath+i+"_BaseActions.txt");
+                BufferedReader br = new BufferedReader(new FileReader(file));
+                String line;
+                while ((line = br.readLine()) != null) {
+                    if (line.equals("#Monitorable")) {
+                        while ((line = br.readLine()).length() > 0) {
+                            String[] strs = line.split(",", 0);
+                            monitorable.addAll(Arrays.asList(strs));
+                        }
+                    } else if (line.equals("#Controllable")) {
+                        while ((line = br.readLine()) != null && line.length() > 0) {
+                            String[] strs = line.split(",", 0);
+                            controllable.addAll(Arrays.asList(strs));
+                        }
+                    }
+                }
+                br.close();
+                for (String pre : monitorable) {
+                    for (String act : controllable) {
+                        Rule rule = new Rule(new Condition(pre), act);
+                        for (String post : monitorable) {
+                            rule.addNewPostCondition(new Condition(post));
+                        }
+                        rules.add(rule);
+                    }
+                }
+            } catch (IOException e) {
+                System.err.println(e.toString());
+            }
+        }
+        return rules;
+    }
+    
     public static void outputResult(List<Rule> rules, double threshold) {
         try {
             File file = new File(resultPath);
@@ -176,6 +247,9 @@ public class PUtils {
             int index = 0;
             int robotId = -1;
             for (Rule rule : rules) {
+                if (rule.neverUpdated()) {
+                    continue;
+                }
                 if (robotId != getRobotId(rule)) {
                     index = 0;
                     robotId = getRobotId(rule);

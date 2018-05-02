@@ -9,7 +9,7 @@ public class Condition {
     
     public Condition(String name) {
         this.name = name;
-        this.value = 0.5;
+        this.value = 0.5; // initial value;
         this.preValue = 0.5;
         this.gradient = 0;
         this.count = 0;
