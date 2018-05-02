@@ -24,10 +24,20 @@ public class Utils {
     private static String tracesPath = resourcesPath+"Traces.txt";
     private static String baseActionsPath = resourcesPath+"BaseActions.txt";
     private static String resultPath = originalPath+"Result.txt";
-    private static String modelPath = originalPath+"Domain.txt";
+    private static String domainPath = originalPath+"Domain.txt";
     private static String configPath = originalPath+"resources/parameters.config";
     
     private final static String tab = "  ";
+    
+    public static void reflesh() {
+        String[] paths = {resultPath, domainPath};
+        for (String path : paths) {
+            File file = new File(path);
+            if (file.exists()) {
+                file.delete();
+            }
+        }
+    }
     
     public static List<Rule> readBaseRules() {
         List<Rule> rules = new ArrayList<>();
@@ -171,7 +181,7 @@ public class Utils {
     
     public static void outputDomainModel(List<FSPSentence> fsps) {
         try {
-            File file = new File(modelPath);
+            File file = new File(domainPath);
             PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
             for (int i = 0; i < fsps.size(); i++) {
                 FSPSentence fsp = fsps.get(i);
