@@ -60,4 +60,13 @@ public class Rule {
             }
         }
     }
+    
+    public boolean neverUpdated() {
+        for (Condition cond : this.postConditions) {
+            if (cond.getValue() != 0.5) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

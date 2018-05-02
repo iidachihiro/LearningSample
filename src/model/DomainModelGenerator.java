@@ -19,6 +19,9 @@ public class DomainModelGenerator {
     
     public void generate(List<Rule> rules, double threshold) {
         for (Rule rule : rules) {
+            if (rule.neverUpdated()) {
+                continue;
+            }
             String map = translateMAP(translateCondition(rule.getPreCondition()));
             String action = translateAction(rule.getAction());
             List<String> posts = new ArrayList<>();

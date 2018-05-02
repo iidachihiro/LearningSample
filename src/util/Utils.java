@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import core.ActionSet;
@@ -18,8 +19,10 @@ import model.fsp.Process;
 
 public class Utils {
     private static String originalPath = "../";
-    private static String baseRulesPath = originalPath+"resources/BaseRules.txt";
-    private static String tracesPath = originalPath+"resources/Traces.txt";
+    private static String resourcesPath = originalPath+"resources/";
+    private static String baseRulesPath = resourcesPath+"BaseRules.txt";
+    private static String tracesPath = resourcesPath+"Traces.txt";
+    private static String baseActionsPath = resourcesPath+"BaseActions.txt";
     private static String resultPath = originalPath+"Result.txt";
     private static String modelPath = originalPath+"Domain.txt";
     private static String configPath = originalPath+"resources/parameters.config";
@@ -53,8 +56,7 @@ public class Utils {
         return rules;
     }
     
-    public static void printBaseRules() {
-        List<Rule> rules = readBaseRules();
+    public static void printRules(List<Rule> rules) {
         int i = 0;
         for (Rule rule : rules) {
             System.out.println("Rule "+i);
@@ -62,7 +64,7 @@ public class Utils {
             System.out.println(tab+"action: "+rule.getAction());
             System.out.println(tab+"postConditions: ");
             for (Condition cond : rule.getPostConditions()) {
-                System.out.println(tab+tab+cond.getName());
+                System.out.println(tab+tab+cond.getName()+tab+cond.getValue());
             }
             i++;
         }
@@ -107,7 +109,11 @@ public class Utils {
             File file = new File(resultPath);
             PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
             int index = 0;
+            
             for (Rule rule : rules) {
+                if (rule.neverUpdated()) {
+                    continue;
+                }
                 pw.println("Rule "+index+":");
                 pw.println(tab+"PreCondition: "+rule.getPreCondition().getName());
                 pw.println(tab+"Action: "+rule.getAction());
@@ -124,6 +130,43 @@ public class Utils {
         } catch (IOException e) {
             System.err.println(e.toString());
         }
+    }
+    
+    public static List<Rule> readBaseActions() {
+        List<Rule> rules = new ArrayList<>();
+        List<String> monitorable = new ArrayList<>();
+        List<String> controllable = new ArrayList<>();
+        try {
+            File file = new File(baseActionsPath);
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (line.equals("#Monitorable")) {
+                    while ((line = br.readLine()).length() > 0) {
+                        String[] strs = line.split(",", 0);
+                        monitorable.addAll(Arrays.asList(strs));
+                    }
+                } else if (line.equals("#Controllable")) {
+                    while ((line = br.readLine()) != null && line.length() > 0) {
+                        String[] strs = line.split(",", 0);
+                        controllable.addAll(Arrays.asList(strs));
+                    }
+                }
+            }
+            br.close();
+            for (String pre : monitorable) {
+                for (String act : controllable) {
+                    Rule rule = new Rule(new Condition(pre), act);
+                    for (String post : monitorable) {
+                        rule.addNewPostCondition(new Condition(post));
+                    }
+                    rules.add(rule);
+                }
+            }
+        } catch (IOException e) {
+            System.err.println(e.toString());
+        }
+        return rules;
     }
     
     public static void outputDomainModel(List<FSPSentence> fsps) {
