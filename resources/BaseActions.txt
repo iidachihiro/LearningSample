@@ -1,0 +1,9 @@
+#Monitorable
+arrive.w,arrive.e,arrive.m
+putfail,putsuccess
+pickupfail,pickupsuccess
+
+#Controllable
+move.e,move.w,move.m
+putdown
+pickup

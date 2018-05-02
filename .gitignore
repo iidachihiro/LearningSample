@@ -8,4 +8,4 @@ bin
 Result.txt
 Domain.txt
 updatedLog
-resources
+resources/*_BaseRules.txt
