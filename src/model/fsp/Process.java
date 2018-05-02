@@ -28,7 +28,7 @@ public class Process {
     
     public void addPosts(List<String> posts) {
         List<String> newPosts = new ArrayList<>();
-        for (String post : this.posts) {
+        for (String post : posts) {
             if (!this.posts.contains(post)) {
                 newPosts.add(post);
             }
