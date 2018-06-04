@@ -27,6 +27,9 @@ public class Utils {
     private static String domainPath = originalPath+"Domain.txt";
     private static String configPath = originalPath+"resources/parameters.config";
     
+    // for research/probability
+    private static String probabilityPath = originalPath+"probability/";
+    
     private final static String tab = "  ";
     
     public static void reflesh() {
@@ -249,5 +252,60 @@ public class Utils {
             System.err.println(e.toString());
         }
        return threshold;
+    }
+    
+    //for research/probability
+    public static void writeProbabilities(List<List<Rule>> tmp) {
+        File dir = new File(probabilityPath);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        List<String> names = new ArrayList<>();
+        for (Rule rule : tmp.get(0)) {
+            String pre = rule.getPreCondition().getName();
+            String act = rule.getAction();
+            for (Condition cond : rule.getPostConditions()) {
+                String post = cond.getName();
+                names.add(pre+"_"+act+"_"+post);
+            }
+        }
+        double[][] probabilities = new double[names.size()][tmp.size()];
+        for (int i = 0; i < tmp.size(); i++) {
+            List<Rule> rules = tmp.get(i);
+            int count = 0;
+            for (Rule rule : rules) {
+                for (Condition cond : rule.getPostConditions()) {
+                    probabilities[count][i] = cond.getValue();
+                    count++;
+                }
+            }
+        }
+        
+        try {
+            for (int i = 0; i < names.size(); i++) {
+                if (isValueNeverChanged(probabilities, i)) {
+                    continue;
+                }
+                File file = new File(probabilityPath+names.get(i)+".csv");
+                PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
+                for (int j = 0; j < probabilities[i].length; j++) {
+                    pw.println(j+","+probabilities[i][j]);
+                }
+                pw.close();
+            }
+        } catch (IOException e) {
+            System.err.println(e.toString());
+        }
+        
+    }
+    
+    private static boolean isValueNeverChanged(double[][] probs, int i) {
+        for (int j = 0; j < probs[i].length; j++) {
+            if (probs[i][j] != 0.5) {
+                return false;
+            }
+        }
+        return true;
     }
 }

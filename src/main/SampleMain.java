@@ -16,5 +16,10 @@ public class SampleMain {
         ModelUpdator SGDUpdator = new SGDModelUpdator(rules);
         SGDUpdator.learn(sets);
         System.out.println("learning finished.");
+        
+        //for research/probability
+        System.out.println("make probability files");
+        Utils.writeProbabilities(SGDUpdator.getTmp());
+        System.out.println("finish");
     }
 }

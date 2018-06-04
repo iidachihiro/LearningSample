@@ -22,4 +22,7 @@ public abstract class ModelUpdator {
     public abstract void learn(List<ActionSet> sets);
     
     public abstract void Plearn(List<ActionSet> sets);
+    
+    // for research/probability
+    public abstract List<List<Rule>> getTmp();
 }

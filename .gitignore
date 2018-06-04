@@ -11,3 +11,4 @@ updatedLog
 resources/*_BaseRules.txt
 resources/*_BaseActions.txt
 resources/ParallelTraces.txt
+probability

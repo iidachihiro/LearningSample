@@ -1,5 +1,6 @@
 package model.sgd;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import core.ActionSet;
@@ -12,6 +13,9 @@ import util.Utils;
 
 public class SGDModelUpdator extends ModelUpdator {
     private double THRESHOLD;
+    
+    //for research/probability
+    private List<List<Rule>> tmp = new ArrayList<>();
     
     public SGDModelUpdator(List<Rule> rules) {
         super(rules);
@@ -49,6 +53,9 @@ public class SGDModelUpdator extends ModelUpdator {
                 if (isAffectedByThreshold(rule)) {
                     flag = true;
                 }
+                //for research/probability
+                tmp.add(rules);
+                
                 updatePreValue();
             }
         }
@@ -86,5 +93,10 @@ public class SGDModelUpdator extends ModelUpdator {
             }
         }
         return false;
+    }
+    
+    //for research/probability
+    public List<List<Rule>> getTmp() {
+        return this.tmp;
     }
 }
