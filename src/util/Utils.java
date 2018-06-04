@@ -257,9 +257,10 @@ public class Utils {
     //for research/probability
     public static void writeProbabilities(List<List<Rule>> tmp) {
         File dir = new File(probabilityPath);
-        if (!dir.exists()) {
-            dir.mkdirs();
+        if (dir.exists()) {
+            dir.delete();
         }
+        dir.mkdirs();
 
         List<String> names = new ArrayList<>();
         for (Rule rule : tmp.get(0)) {
@@ -281,7 +282,6 @@ public class Utils {
                 }
             }
         }
-        
         try {
             for (int i = 0; i < names.size(); i++) {
                 if (isValueNeverChanged(probabilities, i)) {
@@ -301,11 +301,6 @@ public class Utils {
     }
     
     private static boolean isValueNeverChanged(double[][] probs, int i) {
-        for (int j = 0; j < probs[i].length; j++) {
-            if (probs[i][j] != 0.5) {
-                return false;
-            }
-        }
-        return true;
+        return probs[i][probs.length-1] == 0.5;
     }
 }
