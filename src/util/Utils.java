@@ -255,31 +255,33 @@ public class Utils {
     }
     
     //for research/probability
-    public static void writeProbabilities(List<List<Rule>> tmp) {
+    public static void writeProbabilities(List<List<Double>> _probabilities, List<String> names) {
+        /*
+        for (List<Rule> rules : tmp) {
+            for (int i = 0; i< rules.size(); i++) {
+                if (rules.get(i).getPreCondition().getName().equals("arrive.e") && rules.get(i).getAction().equals("move.w")) {
+                    for (Condition cond : rules.get(i).getPostConditions()) {
+                        if (cond.getName().equals("arrive.e")) {
+                            System.out.println(cond.getValue());
+                        }
+                    }
+                }
+            }
+        }
+        */
+        
         File dir = new File(probabilityPath);
         if (dir.exists()) {
             dir.delete();
         }
         dir.mkdirs();
-
-        List<String> names = new ArrayList<>();
-        for (Rule rule : tmp.get(0)) {
-            String pre = rule.getPreCondition().getName();
-            String act = rule.getAction();
-            for (Condition cond : rule.getPostConditions()) {
-                String post = cond.getName();
-                names.add(pre+"_"+act+"_"+post);
-            }
-        }
-        double[][] probabilities = new double[names.size()][tmp.size()];
-        for (int i = 0; i < tmp.size(); i++) {
-            List<Rule> rules = tmp.get(i);
-            int count = 0;
-            for (Rule rule : rules) {
-                for (Condition cond : rule.getPostConditions()) {
-                    probabilities[count][i] = cond.getValue();
-                    count++;
-                }
+        
+        double[][] probabilities = new double[names.size()][_probabilities.size()];
+        System.out.println(_probabilities.get(0).size());
+        System.out.println(_probabilities.size());
+        for (int i = 0; i < names.size(); i++) {
+            for (int j = 0; j < probabilities[i].length; j++) {
+                probabilities[i][j] = _probabilities.get(j).get(i);
             }
         }
         try {

@@ -15,11 +15,22 @@ public class SGDModelUpdator extends ModelUpdator {
     private double THRESHOLD;
     
     //for research/probability
-    private List<List<Rule>> tmp = new ArrayList<>();
+    private List<List<Double>> probabilities;
+    private List<String> names;
     
     public SGDModelUpdator(List<Rule> rules) {
         super(rules);
         this.THRESHOLD = Utils.readThreshold();
+        probabilities = new ArrayList<>();
+        names = new ArrayList<>();
+        for (Rule rule : rules) {
+            String pre = rule.getPreCondition().getName();
+            String act = rule.getAction();
+            for (Condition cond : rule.getPostConditions()) {
+                String post = cond.getName();
+                names.add(pre+"_"+act+"_"+post);
+            }
+        }
     }
     
     public void learn(List<ActionSet> sets) {
@@ -46,6 +57,7 @@ public class SGDModelUpdator extends ModelUpdator {
     public boolean update(ActionSet as) {
         boolean flag = false;
         StochasticGradientDescent sgd = new StochasticGradientDescent();
+        List<Double> tmp = new ArrayList<>();
         for (Rule rule : rules) {
             if (rule.isSameKind(as)) {
                 Rule updatedRule = sgd.getUpdatedRule(rule, as.getPostMonitorableAction());
@@ -53,12 +65,13 @@ public class SGDModelUpdator extends ModelUpdator {
                 if (isAffectedByThreshold(rule)) {
                     flag = true;
                 }
-                //for research/probability
-                tmp.add(rules);
-                
                 updatePreValue();
             }
+            for (Condition cond : rule.getPostConditions()) {
+                tmp.add(cond.getValue());
+            }
         }
+        probabilities.add(tmp);
         return flag;
     }
     
@@ -96,7 +109,11 @@ public class SGDModelUpdator extends ModelUpdator {
     }
     
     //for research/probability
-    public List<List<Rule>> getTmp() {
-        return this.tmp;
+    public List<List<Double>> getProbabilities() {
+        return this.probabilities;
+    }
+    
+    public List<String> getNames() {
+        return this.names;
     }
 }

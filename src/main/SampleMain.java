@@ -19,7 +19,7 @@ public class SampleMain {
         
         //for research/probability
         System.out.println("make probability files");
-        Utils.writeProbabilities(SGDUpdator.getTmp());
+        Utils.writeProbabilities(SGDUpdator.getProbabilities(), SGDUpdator.getNames());
         System.out.println("finish");
     }
 }
