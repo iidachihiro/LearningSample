@@ -1,5 +1,6 @@
 package model.sgd;
 
+import java.io.File;
 import java.util.List;
 
 import core.ActionSet;
@@ -15,16 +16,32 @@ public class SGDModelUpdator extends ModelUpdator {
     
     public SGDModelUpdator(List<Rule> rules) {
         super(rules);
-        this.THRESHOLD = Utils.readThreshold();
+        this.THRESHOLD = Utils.getLearningRate();
     }
     
-    public void learn(List<ActionSet> sets) {
+    public void learn(List<ActionSet> sets, boolean OUTPUT_PROBABILITY_TABLE) {
+        if (OUTPUT_PROBABILITY_TABLE) {
+            System.out.println("OUTPUT_PROBABILITY_TABLE is true. ProbabilityTable.csv will be output.");
+            Utils.prepareProbabilityTable(this.rules);
+        }
+        int index = 1;
         for (ActionSet as : sets) {
             if (update(as)) {
                 Utils.outputResult(this.rules, THRESHOLD);
                 DomainModelGenerator generator = new DomainModelGenerator();
                 generator.generate(this.rules, THRESHOLD);
             }
+            if (OUTPUT_PROBABILITY_TABLE) {
+                Utils.updateProbabilityTable(this.rules, index);
+                index++;
+            }
+        }
+        if (!(new File(Utils.getResultPath()).exists())) {
+            Utils.outputResult(this.rules, THRESHOLD);
+        }
+        if (!(new File(Utils.getDomainPath()).exists())) {
+            DomainModelGenerator generator = new DomainModelGenerator();
+            generator.generate(this.rules, THRESHOLD);
         }
     }
     

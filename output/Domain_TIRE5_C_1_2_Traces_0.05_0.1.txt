@@ -1,0 +1,12 @@
+MAP['w]=
+(move['e] -> (arrive['m] -> MAP['m])
+|putdown -> (putfail -> MAP['w]|putsuccess -> MAP['w])
+),
+MAP['m]=
+(move['e] -> (arrive['e] -> MAP['e]|arrive['m] -> MAP['m])
+|move['w] -> (arrive['w] -> MAP['w])
+),
+MAP['e]=
+(pickup -> (pickupfail -> MAP['e]|pickupsuccess -> MAP['e])
+|move['w] -> (arrive['m] -> MAP['m])
+).

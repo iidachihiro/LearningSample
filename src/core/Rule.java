@@ -69,4 +69,8 @@ public class Rule {
         }
         return true;
     }
+    
+    public void removePostCondition(int index) {
+        this.postConditions.remove(index);
+    }
 }

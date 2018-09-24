@@ -1,0 +1,45 @@
+Rule 1:
+  PreCondition: arrive.w
+  Action: move.e
+  PostConditions: 
+    arrive.m  1.0
+Rule 2:
+  PreCondition: arrive.m
+  Action: move.e
+  PostConditions: 
+    arrive.e  0.9999692790321726
+Rule 3:
+  PreCondition: arrive.e
+  Action: pickup
+  PostConditions: 
+    pickupsuccess  0.9368038983127583
+Rule 4:
+  PreCondition: pickupfail
+  Action: pickup
+  PostConditions: 
+    pickupsuccess  0.6570318002747323
+Rule 5:
+  PreCondition: pickupsuccess
+  Action: move.w
+  PostConditions: 
+    arrive.m  1.0
+Rule 6:
+  PreCondition: arrive.w
+  Action: putdown
+  PostConditions: 
+    putfail  0.8139634978057098
+Rule 7:
+  PreCondition: putfail
+  Action: putdown
+  PostConditions: 
+    putsuccess  0.7489559458101784
+Rule 8:
+  PreCondition: putsuccess
+  Action: move.e
+  PostConditions: 
+    arrive.m  1.0
+Rule 9:
+  PreCondition: arrive.m
+  Action: move.w
+  PostConditions: 
+    arrive.w  1.0

@@ -15,7 +15,7 @@ public class StochasticGradientDescent {
         this.total = 0;
         this.observedData = null;
         pos = 0;
-        this.LEARNING_RATE = Utils.readLearningRate();
+        this.LEARNING_RATE = Utils.getLearningRate();
     }
     
     public Rule getUpdatedRule(Rule rule, String observedData) {

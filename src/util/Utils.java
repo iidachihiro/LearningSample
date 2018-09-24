@@ -18,25 +18,135 @@ import model.fsp.FSPSentence;
 import model.fsp.Process;
 
 public class Utils {
-    private static String originalPath = "../";
-    private static String resourcesPath = originalPath+"resources/";
-    private static String baseRulesPath = resourcesPath+"BaseRules.txt";
-    private static String tracesPath = resourcesPath+"Traces.txt";
-    private static String baseActionsPath = resourcesPath+"BaseActions.txt";
-    private static String resultPath = originalPath+"Result.txt";
-    private static String domainPath = originalPath+"Domain.txt";
-    private static String configPath = originalPath+"resources/parameters.config";
+    private static String originalPath;
+    private static String resourcesPath;
+    private static String baseRulesPath;
+    private static String tracesPath;
+    private static String baseActionsPath;
+    private static String outputPath;
+    private static String resultPath;
+    private static String domainPath;
+    private static String probabilityTablePath;
+    private static String configPath;
+    
+    private static String traceFileName = "Traces.txt";
+    private static String baseRulesFileName = "BaseRules.txt";
+    private static String baseActionsFileName = "BaseActions.txt";
+    private static double learningRate = 0.1;
+    private static double threshold = 0.1;
+    
     
     private final static String tab = "  ";
     
+    public Utils() {
+        originalPath = System.getProperty("user.dir");
+        originalPath += "/";
+        resourcesPath = originalPath+"resources/";
+        outputPath = originalPath+"output/";
+        configPath = resourcesPath+"learning.config";
+        
+        setConfig();
+        tracesPath = resourcesPath+traceFileName;
+        baseRulesPath = resourcesPath+baseRulesFileName;
+        baseActionsPath = resourcesPath+baseActionsFileName;
+        resultPath = outputPath+"Result_"+makeIdentificationPart()+".txt";
+        domainPath = outputPath+"Domain_"+makeIdentificationPart()+".txt";
+        probabilityTablePath = outputPath+"ProbabilityTable_"+makeIdentificationPart()+".csv";
+    }    
+    
+    private static void setConfig() {
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(new File(configPath)));
+            String line;
+            while ((line = br.readLine()) != null) {
+                line = removeSpace(line);
+                if (line.startsWith("TraceFileName")) {
+                    traceFileName = line.substring("TraceFileName=".length());
+                } else if (line.startsWith("BaseRulesFileName")) {
+                    baseRulesFileName = line.substring("BaseRulesFileName=".length());
+                } else if (line.startsWith("BaseActionsFileName")) {
+                    baseActionsFileName = line.substring("BaseACtionsFileName=".length());
+                } else if (line.startsWith("#SGD")) {
+                    boolean flagLR = false, flagTH = false;
+                    while ((line = br.readLine()) != null) {
+                        if (flagLR && flagTH) { 
+                            break;
+                        }
+                        line = removeSpace(line);
+                        if (line.startsWith("LearningRate")) {
+                            learningRate = Double.valueOf(line.substring("LearningRate=".length()));
+                            flagLR = true;
+                        } else if (line.startsWith("Threshold")) {
+                            threshold = Double.valueOf(line.substring("Threshold=".length()));
+                            flagTH = true;
+                        }
+                    }
+                }
+            }
+            br.close();
+        } catch (IOException e) {
+            System.err.println(e.toString());
+        }
+    }
+    
+    public static String getBasePath() {
+        return originalPath;
+    }
+    
+    public static String getResourcesPath() {
+        return resourcesPath;
+    }
+    
+    public static String getBaseRulesPath() {
+        return baseRulesPath;
+    }
+    
+    public static String getOutputPath() {
+        return outputPath;
+    }
+    
+    public static String getProbabilityTablePath() {
+        return probabilityTablePath;
+    }
+    
+    public static String getConfigPath() {
+        return configPath;
+    }
+    
+    public static String getDomainPath() {
+        return domainPath;
+    }
+    
+    public static String getResultPath() {
+        return resultPath;
+    }
+    
+    public static double getLearningRate() {
+        return learningRate;
+    }
+    
+    public static double getThreshold() {
+        return threshold;
+    }
+    
+    public static String getTraceFileName() {
+        return traceFileName;
+    }
+    
     public static void reflesh() {
-        String[] paths = {resultPath, domainPath};
+        String[] paths = {resultPath, domainPath, probabilityTablePath};
         for (String path : paths) {
             File file = new File(path);
             if (file.exists()) {
                 file.delete();
             }
         }
+    }
+    
+    public static String removeSpace(String line) {
+        line = line.replaceAll(" ", "");
+        line = line.replaceAll("\t", "");
+        return line;
     }
     
     public static List<Rule> readBaseRules() {
@@ -46,6 +156,9 @@ public class Utils {
             BufferedReader br = new BufferedReader(new FileReader(file));
             String line;
             while ((line = br.readLine()) != null) {
+                if (line.substring(0, 2).equals("//")) {
+                    continue;
+                }
                 ActionSet as = new ActionSet(line.split(",", 0));
                 boolean isNewRule = true;
                 for (Rule rule : rules) {
@@ -63,6 +176,7 @@ public class Utils {
         } catch (IOException e) {
             System.err.println(e.toString());
         }
+        System.out.println("Read base rules file.");
         return rules;
     }
     
@@ -103,6 +217,7 @@ public class Utils {
         } catch (IOException e) {
             System.err.println(e.toString());
         }
+        System.out.println("Read traces file.");
         return sets;
     }
     
@@ -118,7 +233,7 @@ public class Utils {
         try {
             File file = new File(resultPath);
             PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
-            int index = 0;
+            int index = 1;
             
             for (Rule rule : rules) {
                 if (rule.neverUpdated()) {
@@ -140,6 +255,7 @@ public class Utils {
         } catch (IOException e) {
             System.err.println(e.toString());
         }
+        System.out.println("Generate Result.txt");
     }
     
     public static List<Rule> readBaseActions() {
@@ -176,6 +292,7 @@ public class Utils {
         } catch (IOException e) {
             System.err.println(e.toString());
         }
+        System.out.println("Read base actions file.");
         return rules;
     }
     
@@ -211,43 +328,58 @@ public class Utils {
         } catch (IOException e) {
             System.out.println(e.toString());
         }
+        System.out.println("Generate Domain.txt");
     }
     
-    public static double readLearningRate() {
-        double rate = 0.1;
+    public static void prepareProbabilityTable(List<Rule> rules) {
         try {
-            File file = new File(configPath);
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] str = line.split(" ", 0);
-                if (str[0].equals("Learning_Rate")) {
-                    rate = Double.parseDouble(str[2]);
+            File file = new File(probabilityTablePath);
+            PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
+            pw.print("ActionSet,");
+            for (Rule rule : rules) {
+                for (Condition postCond : rule.getPostConditions()) {
+                    pw.print(rule.getPreCondition().getName()+" "+rule.getAction()+" "+postCond.getName()+",");
                 }
             }
-            br.close();
+            pw.println();
+            pw.print("0,");
+            for (Rule rule : rules) {
+                for (Condition postCond : rule.getPostConditions()) {
+                    pw.print(postCond.getValue()+",");
+                }
+            }
+            pw.println();
+            pw.close();
         } catch (IOException e) {
             System.err.println(e.toString());
         }
-        return rate;
+        System.out.println("Generate probability table file.");
     }
     
-    public static double readThreshold() {
-        double threshold = 0.1;
+    public static void updateProbabilityTable(List<Rule> rules, int index) {
         try {
-            File file = new File(configPath);
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] str = line.split(" ", 0);
-                if (str[0].equals("Threshold")) {
-                    threshold = Double.parseDouble(str[2]);
+            File file = new File(probabilityTablePath);
+            PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
+            pw.print(index+",");
+            for (Rule rule : rules) {
+                for (Condition postCond : rule.getPostConditions()) {
+                    pw.print(postCond.getValue()+",");
                 }
             }
-            br.close();
+            pw.println();
+            pw.close();
         } catch (IOException e) {
             System.err.println(e.toString());
         }
-       return threshold;
+    }
+    
+    public static String makeIdentificationPart() {
+        String result = "";
+        result += traceFileName.substring(0,  traceFileName.length()-4); // ".txt" is removed.
+        result += "_";
+        result += learningRate;
+        result += "_";
+        result += threshold;
+        return result;
     }
 }
